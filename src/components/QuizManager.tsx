@@ -60,7 +60,7 @@ const QuizManager: React.FC<QuizManagerProps> = ({ chapterId, chapterTitle, onBa
   const [questionForm, setQuestionForm] = useState({
     question: '',
     type: 'multiple_choice' as 'multiple_choice' | 'true_false',
-    options: ['', '', '', ''],
+    options: [''],
     correct_answer: '',
     explanation: '',
     order_index: 1
@@ -199,7 +199,7 @@ const QuizManager: React.FC<QuizManagerProps> = ({ chapterId, chapterTitle, onBa
     setQuestionForm({
       question: '',
       type: 'multiple_choice',
-      options: ['', '', '', ''],
+      options: [''],
       correct_answer: '',
       explanation: '',
       order_index: 1
@@ -212,7 +212,7 @@ const QuizManager: React.FC<QuizManagerProps> = ({ chapterId, chapterTitle, onBa
     setQuestionForm({
       question: question.question,
       type: question.type,
-      options: question.options || ['', '', '', ''],
+options: question.options && question.options.length > 0 ? question.options : [''],
       correct_answer: question.correct_answer,
       explanation: question.explanation || '',
       order_index: question.order_index
@@ -417,24 +417,45 @@ const QuizManager: React.FC<QuizManagerProps> = ({ chapterId, chapterTitle, onBa
                           </Select>
                         </div>
 
-                        {questionForm.type === 'multiple_choice' && (
-                          <div className="space-y-2">
-                            <Label>Options</Label>
-                            {questionForm.options.map((option, index) => (
-                              <Input
-                                key={index}
-                                value={option}
-                                onChange={(e) => {
-                                  const newOptions = [...questionForm.options];
-                                  newOptions[index] = e.target.value;
-                                  setQuestionForm({ ...questionForm, options: newOptions });
-                                }}
-                                placeholder={`Option ${index + 1}`}
-                              />
-                            ))}
-                          </div>
-                        )}
-
+                      {questionForm.type === 'multiple_choice' && (
+  <div className="space-y-2">
+    <Label>Options</Label>
+    {questionForm.options.map((option, index) => (
+      <div key={index} className="flex gap-2 mb-2">
+        <Input
+          value={option}
+          onChange={(e) => {
+            const newOptions = [...questionForm.options];
+            newOptions[index] = e.target.value;
+            setQuestionForm({ ...questionForm, options: newOptions });
+          }}
+          placeholder={`Option ${index + 1}`}
+        />
+        {questionForm.options.length > 1 && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const newOptions = questionForm.options.filter((_, i) => i !== index);
+              setQuestionForm({ ...questionForm, options: newOptions });
+            }}
+          >
+            Remove
+          </Button>
+        )}
+      </div>
+    ))}
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={() => setQuestionForm({ ...questionForm, options: [...questionForm.options, ''] })}
+    >
+      Add Option
+    </Button>
+  </div>
+)}
                         <div className="space-y-2">
                           <Label htmlFor="correct-answer">Correct Answer</Label>
                           {questionForm.type === 'multiple_choice' ? (
