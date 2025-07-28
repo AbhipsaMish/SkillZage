@@ -168,6 +168,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+    window.location.href = '/'; // Always redirect to index page after sign out
   };
 
   const value = {
