@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { BookOpen, Clock, Star, ShoppingCart, Play, Lock, User, GraduationCap, Settings, Users } from 'lucide-react';
+import { BookOpen, Clock, Star, ShoppingCart, Play, Lock, User, GraduationCap, Settings } from 'lucide-react';
 import StudentProfile from '@/components/StudentProfile';
 
 interface Course {
@@ -226,13 +226,6 @@ const StudentDashboard = () => {
     }
   };
 
-  const getProgressColor = (progress: number) => {
-    if (progress === 0) return 'bg-[#9FABBA]';
-    if (progress < 50) return 'bg-[#FA8231]';
-    if (progress < 80) return 'bg-[#FED330]';
-    return 'bg-[#EFB72E]';
-  };
-
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
@@ -245,218 +238,285 @@ const StudentDashboard = () => {
     const progress = courseProgress[course.id];
     
     return (
-      <div className="bg-[#FFFFFF] rounded-xl shadow-sm overflow-hidden border border-[#9FABBA] hover:shadow-lg transition-all duration-300 hover:-translate-y-1 relative">
-        <div className="relative">
-          <img 
-            src={course.thumbnail_url || 'https://via.placeholder.com/400x200/F0F0F0/999999?text=Course+Image'} 
-            alt={course.title}
-            className="w-full h-48 object-cover"
-          />
-          <div className="absolute top-4 right-4 bg-[#FFFFFF] px-2 py-1 rounded-lg text-sm font-bold text-[#000000]">
-            {course.is_free ? 'FREE' : `${course.currency} ${course.price}`}
-          </div>
-          {(isPurchased || isUniversityCourse) && progress && progress.completion_percentage > 0 && (
-            <div className="absolute top-4 left-4 bg-[#11283F] text-[#FFFFFF] px-2 py-1 rounded-lg text-xs font-medium">
-              In Progress
-            </div>
-          )}
-          {isUniversityCourse && (
-            <div className="absolute bottom-2 left-2">
-              <Badge variant="secondary" className="bg-[#11283F] text-[#FFFFFF] text-xs">University Course</Badge>
-            </div>
-          )}
-        </div>
+      <Card className="group relative overflow-hidden border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-[#11283F] uppercase tracking-wider">
-              {course.category}
-            </span>
-            <div className="flex items-center space-x-1">
-              <Star className="text-[#EFB72E] fill-current" size={16} />
-              <span className="text-sm text-[#4B6584]">4.8</span>
-            </div>
-          </div>
-
-          <h3 className="text-lg font-bold text-[#000000] mb-2 line-clamp-2">{course.title}</h3>
-
-          <p className="text-sm text-[#4B6584] mb-4 line-clamp-2">{course.description}</p>
-
-          <div className="flex items-center justify-between text-sm text-[#9FABBA] mb-4">
-            <div className="flex items-center space-x-1">
-              <Users size={16} />
-              <span>2.5k</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Clock size={16} />
-              <span>8 weeks</span>
-            </div>
-          </div>
-
-          {(isPurchased || isUniversityCourse) && progress && progress.completion_percentage > 0 && (
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm text-[#4B6584]">Progress</span>
-                <span className="text-sm font-medium text-[#000000]">{progress.completion_percentage}%</span>
-              </div>
-              <div className="w-full bg-[#9FABBA] rounded-full h-2">
-                <div 
-                  className={`h-2 rounded-full ${getProgressColor(progress.completion_percentage)}`}
-                  style={{ width: `${progress.completion_percentage}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {(isPurchased || isUniversityCourse) ? (
-            <Link to={`/course/${course.id}`}>
-              <button className="w-full bg-gradient-to-r from-[#11283F] to-[#4B6584] text-[#FFFFFF] py-3 px-4 rounded-lg font-medium hover:from-[#000000] hover:to-[#11283F] transition-all duration-200 flex items-center justify-center space-x-2">
-                <Play size={18} />
-                <span>{progress && progress.completion_percentage > 0 ? 'Continue Learning' : 'Start Course'}</span>
-              </button>
-            </Link>
+        {/* Thumbnail Section */}
+        <div className="relative h-48 w-full overflow-hidden">
+          {course.thumbnail_url ? (
+            <img 
+              src={course.thumbnail_url} 
+              alt={course.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
           ) : (
-            <div className="flex space-x-2">
-              <button 
-                onClick={() => handlePreviewCourse(course)}
-                className="flex-1 bg-[#9FABBA] text-[#FFFFFF] py-2 px-3 rounded-lg font-medium hover:bg-[#7A8B9A] transition-all duration-200 flex items-center justify-center space-x-1"
-              >
-                <BookOpen size={16} />
-                <span>Preview</span>
-              </button>
-              <button 
-                onClick={() => handlePurchaseCourse(course.id, course)}
-                className="flex-1 bg-[#FA8231] text-[#FFFFFF] py-2 px-3 rounded-lg font-medium hover:bg-[#E8741C] transition-all duration-200 flex items-center justify-center space-x-1"
-              >
-                <ShoppingCart size={16} />
-                <span>{course.is_free ? 'Get Free' : 'Buy Now'}</span>
-              </button>
+            <div className="w-full h-full bg-gradient-to-br from-orange-100 via-orange-50 to-slate-50 flex items-center justify-center">
+              <div className="text-center space-y-2">
+                <div className="p-3 bg-white/80 rounded-full mx-auto w-fit backdrop-blur-sm">
+                  <BookOpen className="h-8 w-8 text-orange-500" />
+                </div>
+                <p className="text-sm font-medium text-slate-700">Course Preview</p>
+              </div>
             </div>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
+          {/* Course badges overlay */}
+          <div className="absolute top-3 right-3 flex flex-col space-y-2">
+            {isUniversityCourse && (
+              <Badge className="bg-slate-800/90 hover:bg-slate-900 text-white border-0 text-xs px-2 py-1 backdrop-blur-sm">
+                University Course
+              </Badge>
+            )}
+            {course.is_free ? (
+              <Badge className="bg-emerald-500/90 hover:bg-emerald-600 text-white border-0 text-xs px-2 py-1 font-semibold backdrop-blur-sm">
+                FREE
+              </Badge>
+            ) : (
+              course.type === 'public' && !isPurchased && (
+                <Badge className="bg-white/90 text-slate-700 border-0 text-xs px-2 py-1 font-medium backdrop-blur-sm">
+                  {course.currency} {course.price}
+                </Badge>
+              )
+            )}
+          </div>
         </div>
-      </div>
+
+        <CardHeader className="relative z-10 pb-3">
+          <div className="space-y-3">
+            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+              <BookOpen className="h-3 w-3 mr-1" />
+              {course.category}
+            </div>
+            <CardTitle className="text-lg font-bold text-slate-800 group-hover:text-slate-900 transition-colors">
+              {course.title}
+            </CardTitle>
+            <CardDescription className="line-clamp-2 text-slate-600 text-sm leading-relaxed">
+              {course.description}
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="relative z-10 pt-0">
+          <div className="space-y-4">
+            {/* Progress bar for purchased courses */}
+            {(isPurchased || isUniversityCourse) && progress && (
+              <div className="space-y-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-slate-700">Progress</span>
+                  <span className="text-sm font-bold text-slate-800">{progress.completion_percentage}%</span>
+                </div>
+                <div className="relative">
+                  <Progress 
+                    value={progress.completion_percentage} 
+                    className="h-2 bg-slate-200"
+                  />
+                  <div 
+                    className="absolute top-0 left-0 h-2 rounded-full bg-gradient-to-r from-slate-600 to-slate-800 transition-all duration-500"
+                    style={{ width: `${progress.completion_percentage}%` }}
+                  />
+                </div>
+                <p className="text-xs text-slate-600">
+                  {progress.completed_chapters} of {progress.total_chapters} chapters completed
+                </p>
+              </div>
+            )}
+            
+            <div className="flex justify-between items-center pt-2">
+              <div className="flex space-x-2">
+                {(isPurchased || isUniversityCourse) ? (
+                  <Button 
+                    size="sm" 
+                    asChild
+                    className="bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 hover:from-orange-600 hover:via-pink-600 hover:to-rose-600 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-lg"
+                  >
+                    <Link to={`/course/${course.id}`}>
+                      <Play className="h-4 w-4 mr-2" />
+                      Continue Learning
+                    </Link>
+                  </Button>
+                ) : (
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handlePreviewCourse(course)}
+                      className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-medium px-3 py-2 rounded-lg transition-all duration-200"
+                    >
+                      Preview
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      onClick={() => handlePurchaseCourse(course.id, course)}
+                      className="bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 hover:from-orange-600 hover:via-pink-600 hover:to-rose-600 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-lg"
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      {course.is_free ? 'Get Free' : 'Buy Now'}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
       {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <GraduationCap className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-2xl font-bold">Skillzage</h1>
-              <p className="text-sm text-muted-foreground">
-                Welcome back, {profile?.name}
-              </p>
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-5">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-gradient-to-br from-orange-400 via-pink-400 to-rose-400 rounded-xl shadow-lg">
+                <GraduationCap className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900">Skillzage</h1>
+                <p className="text-sm text-slate-600 font-medium">
+                  Welcome back, <span className="text-slate-800">{profile?.name}</span>
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            {university && (
-              <Badge variant="outline" className="flex items-center space-x-1">
-                <User className="h-3 w-3" />
-                <span>{university.name}</span>
-              </Badge>
-            )}
-            <Button
-              variant={activeTab === 'profile' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('profile')}
-              size="sm"
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Profile
-            </Button>
-            <Button
-              variant={activeTab === 'courses' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('courses')}
-              size="sm"
-            >
-              <BookOpen className="h-4 w-4 mr-2" />
-              Courses
-            </Button>
-            <Button variant="outline" onClick={signOut}>
-              Sign Out
-            </Button>
+            <div className="flex items-center space-x-4">
+              {university && (
+                <Badge className="flex items-center space-x-2 bg-gradient-to-r from-orange-100 via-pink-50 to-rose-50 text-orange-800 border-orange-200 hover:from-orange-200 hover:via-pink-100 hover:to-rose-100 px-3 py-1.5 rounded-full font-medium transition-all duration-200">
+                  <User className="h-3 w-3" />
+                  <span>{university.name}</span>
+                </Badge>
+              )}
+              <Button
+                variant={activeTab === 'profile' ? 'default' : 'outline'}
+                onClick={() => setActiveTab('profile')}
+                size="sm"
+                className={`font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
+                  activeTab === 'profile' 
+                    ? 'bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 hover:from-orange-600 hover:via-pink-600 hover:to-rose-600 text-white shadow-lg' 
+                    : 'border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'
+                }`}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Profile
+              </Button>
+              <Button
+                variant={activeTab === 'courses' ? 'default' : 'outline'}
+                onClick={() => setActiveTab('courses')}
+                size="sm"
+                className={`font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
+                  activeTab === 'courses' 
+                    ? 'bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 hover:from-orange-600 hover:via-pink-600 hover:to-rose-600 text-white shadow-lg' 
+                    : 'border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'
+                }`}
+              >
+                <BookOpen className="h-4 w-4 mr-2" />
+                Courses
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={signOut}
+                className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200"
+              >
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-6 py-8">
         {activeTab === 'profile' ? (
           <StudentProfile />
         ) : previewCourse ? (
           /* Course Preview Modal */
-          <div className="space-y-6">
+          <div className="space-y-8 max-w-4xl mx-auto">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-3xl font-bold">{previewCourse.title}</h2>
-                <p className="text-muted-foreground mt-2">{previewCourse.description}</p>
+              <div className="space-y-2">
+                <h2 className="text-4xl font-bold text-slate-900">{previewCourse.title}</h2>
+                <p className="text-lg text-slate-600 leading-relaxed max-w-3xl">{previewCourse.description}</p>
               </div>
-              <Button variant="outline" onClick={() => setPreviewCourse(null)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setPreviewCourse(null)}
+                className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-medium px-6 py-2 rounded-lg transition-all duration-200"
+              >
                 Back to Courses
               </Button>
             </div>
             
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <BookOpen className="h-6 w-6" />
-                  <span>Course Content</span>
+            <Card className="border-slate-200 shadow-lg bg-white">
+              <CardHeader className="bg-gradient-to-r from-orange-50 via-pink-50 to-rose-50 border-b border-orange-100 pb-6">
+                <CardTitle className="flex items-center space-x-3 text-xl">
+                  <div className="p-2 bg-gradient-to-br from-orange-400 via-pink-400 to-rose-400 rounded-lg shadow-lg">
+                    <BookOpen className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="text-slate-900 font-bold">Course Content</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <div className="space-y-4">
                   {previewChapters.map((chapter, index) => (
-                    <div key={chapter.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-sm font-medium">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{chapter.title}</h4>
-                          <p className="text-sm text-muted-foreground">{chapter.description}</p>
+                    <div key={chapter.id} className="group flex items-center justify-between p-5 border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-md transition-all duration-200 bg-white hover:bg-slate-50">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-orange-400 via-pink-400 to-rose-400 rounded-full flex items-center justify-center text-sm font-bold text-white group-hover:from-orange-500 group-hover:via-pink-500 group-hover:to-rose-500 transition-all duration-200 shadow-lg">{index + 1}</div>
+                        <div className="space-y-1">
+                          <h4 className="font-semibold text-slate-900 group-hover:text-slate-800 transition-colors">{chapter.title}</h4>
+                          <p className="text-sm text-slate-600 leading-relaxed">{chapter.description}</p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3">
                         {chapter.is_preview ? (
-                          <Badge variant="outline" className="text-green-600 border-green-600">
+                          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-200 px-3 py-1 rounded-full font-medium">
                             Preview Available
                           </Badge>
                         ) : (
-                          <Lock className="h-4 w-4 text-muted-foreground" />
+                          <div className="p-2 bg-slate-100 rounded-full">
+                            <Lock className="h-4 w-4 text-slate-500" />
+                          </div>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
                 
-                <div className="mt-6 pt-6 border-t flex justify-between items-center">
-                  <div className="space-y-1">
-                    <p className="font-medium">Ready to start learning?</p>
-                    <p className="text-sm text-muted-foreground">
-                      {previewCourse.is_free ? 'This course is completely free!' : `Price: ${previewCourse.currency} ${previewCourse.price}`}
-                    </p>
+                <div className="mt-8 pt-8 border-t border-slate-200">
+                  <div className="flex justify-between items-center p-6 bg-gradient-to-r from-orange-50 via-pink-50 to-rose-50 rounded-xl border border-orange-100">
+                    <div className="space-y-2">
+                      <p className="text-xl font-bold text-slate-900">Ready to start learning?</p>
+                      <p className="text-slate-600">
+                        {previewCourse.is_free ? (
+                          <span className="text-emerald-600 font-semibold">This course is completely free!</span>
+                        ) : (
+                          <span>Price: <span className="font-semibold text-slate-800">{previewCourse.currency} {previewCourse.price}</span></span>
+                        )}
+                      </p>
+                    </div>
+                    <Button 
+                      size="lg"
+                      onClick={() => handlePurchaseCourse(previewCourse.id, previewCourse)}
+                      className="bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 hover:from-orange-600 hover:via-pink-600 hover:to-rose-600 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+                    >
+                      <ShoppingCart className="h-5 w-5 mr-3" />
+                      {previewCourse.is_free ? 'Get Free Course' : 'Buy Now'}
+                    </Button>
                   </div>
-                  <Button 
-                    size="lg"
-                    onClick={() => handlePurchaseCourse(previewCourse.id, previewCourse)}
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    {previewCourse.is_free ? 'Get Free Course' : 'Buy Now'}
-                  </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-12">
             {/* University Courses */}
             {universityCourses.length > 0 && (
               <section>
-                <div className="flex items-center space-x-2 mb-6">
-                  <GraduationCap className="h-6 w-6 text-primary" />
-                  <h2 className="text-2xl font-bold">Your University Courses</h2>
+                <div className="flex items-center space-x-3 mb-8">
+                  <div className="p-2 bg-gradient-to-br from-orange-400 via-pink-400 to-rose-400 rounded-xl shadow-lg">
+                    <GraduationCap className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-slate-900">Your University Courses</h2>
+                    <p className="text-slate-600 mt-1">Courses assigned by your institution</p>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {universityCourses.map((course) => (
@@ -473,9 +533,14 @@ const StudentDashboard = () => {
             {/* Purchased Courses */}
             {purchasedCourses.length > 0 && (
               <section>
-                <div className="flex items-center space-x-2 mb-6">
-                  <BookOpen className="h-6 w-6 text-primary" />
-                  <h2 className="text-2xl font-bold">My Courses</h2>
+                <div className="flex items-center space-x-3 mb-8">
+                  <div className="p-2 bg-gradient-to-br from-orange-400 via-pink-400 to-rose-400 rounded-xl shadow-lg">
+                    <BookOpen className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-slate-900">My Courses</h2>
+                    <p className="text-slate-600 mt-1">Continue your learning journey</p>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {purchasedCourses.map((course) => (
@@ -491,22 +556,31 @@ const StudentDashboard = () => {
 
             {/* Public Course Marketplace */}
             <section>
-              <div className="flex items-center space-x-2 mb-6">
-                <ShoppingCart className="h-6 w-6 text-primary" />
-                <h2 className="text-2xl font-bold">Course Marketplace</h2>
+              <div className="flex items-center space-x-3 mb-8">
+                <div className="p-2 bg-gradient-to-br from-orange-400 via-pink-400 to-rose-400 rounded-xl shadow-lg">
+                  <ShoppingCart className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900">Course Marketplace</h2>
+                  <p className="text-slate-600 mt-1">Discover new skills and expand your knowledge</p>
+                </div>
               </div>
               
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="bg-[#FFFFFF] rounded-xl shadow-sm overflow-hidden border border-[#9FABBA] animate-pulse">
-                      <div className="w-full h-48 bg-gray-300"></div>
-                      <div className="p-6">
-                        <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                        <div className="h-3 bg-gray-300 rounded w-full mb-4"></div>
-                        <div className="h-8 bg-gray-300 rounded"></div>
-                      </div>
-                    </div>
+                    <Card key={i} className="animate-pulse border-slate-200 bg-white">
+                      <CardHeader className="space-y-3">
+                        <div className="h-4 bg-slate-200 rounded-lg w-3/4"></div>
+                        <div className="space-y-2">
+                          <div className="h-3 bg-slate-200 rounded w-full"></div>
+                          <div className="h-3 bg-slate-200 rounded w-4/5"></div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-10 bg-slate-200 rounded-lg"></div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               ) : publicCourses.length > 0 ? (
@@ -522,10 +596,13 @@ const StudentDashboard = () => {
                     ))}
                 </div>
               ) : (
-                <Card>
-                  <CardContent className="py-8 text-center">
-                    <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">No courses available yet.</p>
+                <Card className="border-slate-200 bg-white">
+                  <CardContent className="py-16 text-center">
+                    <div className="p-4 bg-slate-100 rounded-full w-fit mx-auto mb-6">
+                      <BookOpen className="h-16 w-16 text-slate-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-slate-900 mb-2">No courses available</h3>
+                    <p className="text-slate-600 max-w-md mx-auto">Check back later for new courses and learning opportunities.</p>
                   </CardContent>
                 </Card>
               )}
@@ -533,13 +610,15 @@ const StudentDashboard = () => {
 
             {/* Empty State */}
             {universityCourses.length === 0 && purchasedCourses.length === 0 && publicCourses.length === 0 && !isLoading && (
-              <div className="text-center py-12">
-                <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No courses found</h3>
-                <p className="text-muted-foreground mb-4">
+              <div className="text-center py-20">
+                <div className="p-6 bg-slate-100 rounded-full w-fit mx-auto mb-8">
+                  <BookOpen className="h-20 w-20 text-slate-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">No courses found</h3>
+                <p className="text-lg text-slate-600 mb-6 max-w-md mx-auto">
                   {!profile?.university_id 
-                    ? "Browse our course marketplace to get started!" 
-                    : "Your university hasn't assigned any courses yet."}
+                    ? "Browse our course marketplace to get started on your learning journey!" 
+                    : "Your university hasn't assigned any courses yet. Check back soon!"}
                 </p>
               </div>
             )}
