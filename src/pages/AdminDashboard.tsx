@@ -175,13 +175,14 @@ const AdminDashboard = () => {
     setIsLoading(false);
   };
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
+ if (!user) {
+    return <Navigate to="/" replace />;
   }
 
   if (profile?.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
+
 
   // Show chapter manager if a course is selected
   if (selectedCourse) {
