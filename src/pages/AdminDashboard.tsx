@@ -13,6 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { University, Settings, BookOpen, Users, BarChart3, Plus } from 'lucide-react';
 import ChapterManager from '@/components/ChapterManager';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface University {
   id: string;
@@ -174,15 +176,39 @@ const AdminDashboard = () => {
     }
     setIsLoading(false);
   };
+ const handleDeleteCourse = async (courseId: string) => {
+    setIsLoading(true);
+    const { error } = await supabase
+      .from('courses')
+      .delete()
+      .eq('id', courseId);
 
- if (!user) {
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete course",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Course deleted successfully",
+      });
+      fetchCourses(); // Refresh course list
+    }
+    setIsLoading(false);
+  };
+
+
+
+
+  if (!user) {
     return <Navigate to="/" replace />;
   }
 
   if (profile?.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
-
 
   // Show chapter manager if a course is selected
   if (selectedCourse) {
@@ -339,12 +365,26 @@ const AdminDashboard = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="course-description">Description</Label>
-                    <Textarea
+                    <ReactQuill
                       id="course-description"
                       value={courseForm.description}
-                      onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
+                      onChange={(value) => setCourseForm({ ...courseForm, description: value })}
+                      modules={{
+                        toolbar: [
+                          [{ 'font': [] }, { 'size': [] }],
+                          ['bold', 'italic', 'underline', 'strike'],
+                          [{ 'color': [] }, { 'background': [] }],
+                          [{ 'align': [] }],
+                          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                          ['link', 'image'],
+                          ['clean']
+                        ]
+                      }}
+                      formats={[
+                        'font', 'size', 'bold', 'italic', 'underline', 'strike',
+                        'color', 'background', 'align', 'list', 'bullet', 'link', 'image'
+                      ]}
                       placeholder="Enter course description"
-                      rows={3}
                     />
                   </div>
 
@@ -469,13 +509,26 @@ const AdminDashboard = () => {
                             <span className="text-muted-foreground">{course.category}</span>
                           </div>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setSelectedCourse(course)}
-                        >
-                          Manage Chapters
-                        </Button>
+                       <div className="flex flex-row gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setSelectedCourse(course)}
+                          >
+                            Manage Chapters
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteCourse(course.id)}
+                            disabled={isLoading}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+
+
+
                       </div>
                     </div>
                   ))}
