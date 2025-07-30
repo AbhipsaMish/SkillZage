@@ -291,9 +291,10 @@ const StudentDashboard = () => {
             <CardTitle className="text-lg font-bold text-slate-800 group-hover:text-slate-900 transition-colors">
               {course.title}
             </CardTitle>
-            <CardDescription className="line-clamp-2 text-slate-600 text-sm leading-relaxed">
-              {course.description}
-            </CardDescription>
+            <div
+  className="line-clamp-2 text-slate-600 text-sm leading-relaxed"
+  dangerouslySetInnerHTML={{ __html: course.description }}
+/>
           </div>
         </CardHeader>
         <CardContent className="relative z-10 pt-0">
