@@ -51,8 +51,6 @@ const QuizManager: React.FC<QuizManagerProps> = ({ chapterId, chapterTitle, onBa
   // Quiz form state
   const [quizForm, setQuizForm] = useState({
     title: '',
-    is_start_quiz: false,
-    is_end_quiz: false,
     passing_score: 70
   });
 
@@ -120,11 +118,33 @@ const QuizManager: React.FC<QuizManagerProps> = ({ chapterId, chapterTitle, onBa
   const handleCreateQuiz = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Auto-determine quiz type based on existing quizzes
+    const existingStartQuiz = quizzes.find(q => q.is_start_quiz);
+    const existingEndQuiz = quizzes.find(q => q.is_end_quiz);
+    
+    let isStartQuiz = false;
+    let isEndQuiz = false;
+    
+    if (!existingStartQuiz) {
+      isStartQuiz = true;
+    } else if (!existingEndQuiz) {
+      isEndQuiz = true;
+    } else {
+      toast({
+        title: "Error",
+        description: "Both start and end quizzes already exist for this chapter.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const { data, error } = await supabase
       .from('quizzes')
       .insert([{
         ...quizForm,
-        chapter_id: chapterId
+        chapter_id: chapterId,
+        is_start_quiz: isStartQuiz,
+        is_end_quiz: isEndQuiz
       }])
       .select()
       .single();
@@ -138,9 +158,9 @@ const QuizManager: React.FC<QuizManagerProps> = ({ chapterId, chapterTitle, onBa
     } else {
       toast({
         title: "Success",
-        description: "Quiz created successfully",
+        description: `${isStartQuiz ? 'Start' : 'End'} quiz created successfully`,
       });
-      setQuizForm({ title: '', is_start_quiz: false, is_end_quiz: false, passing_score: 70 });
+      setQuizForm({ title: '', passing_score: 70 });
       setIsDialogOpen(false);
       fetchQuizzes();
       setSelectedQuiz(data);
@@ -245,6 +265,48 @@ options: question.options && question.options.length > 0 ? question.options : ['
     }
   };
 
+  const handleDeleteQuiz = async (quizId: string) => {
+    if (!confirm('Are you sure you want to delete this quiz? This will also delete all its questions.')) return;
+
+    // First delete all questions for this quiz
+    const { error: questionsError } = await supabase
+      .from('quiz_questions')
+      .delete()
+      .eq('quiz_id', quizId);
+
+    if (questionsError) {
+      toast({
+        title: "Error",
+        description: "Failed to delete quiz questions",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Then delete the quiz
+    const { error } = await supabase
+      .from('quizzes')
+      .delete()
+      .eq('id', quizId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete quiz",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Quiz deleted successfully",
+      });
+      fetchQuizzes();
+      if (selectedQuiz?.id === quizId) {
+        setSelectedQuiz(null);
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -287,24 +349,46 @@ options: question.options && question.options.length > 0 ? question.options : ['
                 />
               </div>
 
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="is-start-quiz"
-                    checked={quizForm.is_start_quiz}
-                    onCheckedChange={(checked) => setQuizForm({ ...quizForm, is_start_quiz: checked })}
-                  />
-                  <Label htmlFor="is-start-quiz">Start Quiz</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="is-end-quiz"
-                    checked={quizForm.is_end_quiz}
-                    onCheckedChange={(checked) => setQuizForm({ ...quizForm, is_end_quiz: checked })}
-                  />
-                  <Label htmlFor="is-end-quiz">End Quiz</Label>
-                </div>
-              </div>
+              {/* Show existing quizzes info */}
+              {(() => {
+                const existingStartQuiz = quizzes.find(q => q.is_start_quiz);
+                const existingEndQuiz = quizzes.find(q => q.is_end_quiz);
+                
+                if (existingStartQuiz && existingEndQuiz) {
+                  return (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-800">
+                        <strong>Both quizzes exist:</strong> Start quiz "{existingStartQuiz.title}" and End quiz "{existingEndQuiz.title}". 
+                        You cannot create more quizzes for this chapter.
+                      </p>
+                    </div>
+                  );
+                } else if (existingStartQuiz) {
+                  return (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <strong>Info:</strong> Start quiz exists. This will create an End quiz.
+                      </p>
+                    </div>
+                  );
+                } else if (existingEndQuiz) {
+                  return (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <strong>Info:</strong> End quiz exists. This will create a Start quiz.
+                      </p>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-800">
+                        <strong>Info:</strong> No quizzes exist. This will create a Start quiz.
+                      </p>
+                    </div>
+                  );
+                }
+              })()}
 
               <div className="space-y-2">
                 <Label htmlFor="passing-score">Passing Score (%)</Label>
@@ -344,16 +428,34 @@ options: question.options && question.options.length > 0 ? question.options : ['
                 {quizzes.map((quiz) => (
                   <div
                     key={quiz.id}
-                    className={`p-3 rounded-lg cursor-pointer border ${
+                    className={`p-3 rounded-lg border ${
                       selectedQuiz?.id === quiz.id ? 'bg-primary/10 border-primary' : 'hover:bg-muted'
                     }`}
-                    onClick={() => setSelectedQuiz(quiz)}
                   >
-                    <h4 className="font-medium">{quiz.title}</h4>
-                    <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
-                      {quiz.is_start_quiz && <span>Start</span>}
-                      {quiz.is_end_quiz && <span>End</span>}
-                      <span>Pass: {quiz.passing_score}%</span>
+                    <div 
+                      className="cursor-pointer"
+                      onClick={() => setSelectedQuiz(quiz)}
+                    >
+                      <h4 className="font-medium">{quiz.title}</h4>
+                      <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
+                        {quiz.is_start_quiz && <span>Start</span>}
+                        {quiz.is_end_quiz && <span>End</span>}
+                        <span>Pass: {quiz.passing_score}%</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-end mt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteQuiz(quiz.id);
+                        }}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 ))}

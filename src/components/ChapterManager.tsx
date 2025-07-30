@@ -130,36 +130,74 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({ courseId, courseTitle, 
         }
       }
 
-      const chapterData = {
+      // Check if this is the last chapter based on order_index
+      const isLastChapter = chapterForm.order_index === chapters.length + (editingChapter ? 0 : 1);
+      
+      const finalChapterData = {
         ...chapterForm,
         course_id: courseId,
-        video_url: videoUrl
+        video_url: videoUrl,
+        has_end_quiz: chapterForm.has_end_quiz
       };
 
       let error;
+      let newChapterId: string | null = null;
+
       if (editingChapter) {
         // Update existing chapter
         const { error: updateError } = await supabase
           .from('chapters')
-          .update(chapterData)
+          .update(finalChapterData)
           .eq('id', editingChapter.id);
         error = updateError;
+        newChapterId = editingChapter.id;
       } else {
         // Create new chapter
-        const { error: insertError } = await supabase
+        const { data: insertData, error: insertError } = await supabase
           .from('chapters')
-          .insert([chapterData]);
+          .insert([finalChapterData])
+          .select('id');
         error = insertError;
+        newChapterId = insertData?.[0]?.id || null;
       }
 
       if (error) {
         throw error;
       }
 
-      toast({
-        title: "Success",
-        description: `Chapter ${editingChapter ? 'updated' : 'created'} successfully`,
-      });
+      // If this is the last chapter and we have a new chapter ID, create an end quiz (only for new chapters)
+      if (!editingChapter && isLastChapter && newChapterId && chapterForm.has_end_quiz) {
+        const quizData = {
+          title: `End Quiz - ${finalChapterData.title}`,
+          chapter_id: newChapterId,
+          is_start_quiz: false,
+          is_end_quiz: true,
+          passing_score: 70
+        };
+
+        const { error: quizError } = await supabase
+          .from('quizzes')
+          .insert([quizData]);
+
+        if (quizError) {
+          console.error('Failed to create end quiz:', quizError);
+          toast({
+            title: "Warning",
+            description: "Chapter created but failed to create end quiz. You can add it manually.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Success",
+            description: `Chapter created successfully with end quiz!`,
+          });
+        }
+      } else {
+        toast({
+          title: "Success",
+          description: `Chapter ${editingChapter ? 'updated' : 'created'} successfully`,
+        });
+      }
 
       resetForm();
       setIsDialogOpen(false);
@@ -425,23 +463,41 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({ courseId, courseTitle, 
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="has-start-quiz"
-                    checked={chapterForm.has_start_quiz}
-                    onCheckedChange={(checked) => setChapterForm({ ...chapterForm, has_start_quiz: checked })}
-                  />
-                  <Label htmlFor="has-start-quiz">Start Quiz</Label>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="has-start-quiz"
+                      checked={chapterForm.has_start_quiz}
+                      onCheckedChange={(checked) => setChapterForm({ ...chapterForm, has_start_quiz: checked })}
+                    />
+                    <Label htmlFor="has-start-quiz">Start Quiz</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="has-end-quiz"
+                      checked={chapterForm.has_end_quiz}
+                      onCheckedChange={(checked) => setChapterForm({ ...chapterForm, has_end_quiz: checked })}
+                    />
+                    <Label htmlFor="has-end-quiz">End Quiz</Label>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="has-end-quiz"
-                    checked={chapterForm.has_end_quiz}
-                    onCheckedChange={(checked) => setChapterForm({ ...chapterForm, has_end_quiz: checked })}
-                  />
-                  <Label htmlFor="has-end-quiz">End Quiz</Label>
-                </div>
+                
+                {(() => {
+                  const isLastChapter = chapterForm.order_index === chapters.length + (editingChapter ? 0 : 1);
+                  return (
+                    <>
+                      {isLastChapter && (
+                        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <p className="text-sm text-blue-800">
+                            <strong>Note:</strong> This appears to be the last chapter. Enable "End Quiz" to automatically create 
+                            a final assessment for students to take after completing the entire course.
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
 
               <DialogFooter>

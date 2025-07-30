@@ -210,32 +210,91 @@ const QuizTaker: React.FC<QuizTakerProps> = ({ quiz, questions, onQuizComplete, 
           <div>
             <h3 className="text-lg font-medium mb-4">{currentQuestion.question}</h3>
             
-            <RadioGroup
-              value={answers[currentQuestion.id] || ''}
-              onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
-            >
+            <div className="space-y-3">
               {currentQuestion.type === 'multiple_choice' ? (
                 currentQuestion.options?.map((option, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <RadioGroupItem value={option} id={`option-${index}`} />
-                    <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
-                      {option}
-                    </Label>
+                  <div
+                    key={index}
+                    className={`relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md ${
+                      answers[currentQuestion.id] === option
+                        ? 'border-blue-500 bg-blue-50 shadow-md'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                    onClick={() => handleAnswerChange(currentQuestion.id, option)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                        answers[currentQuestion.id] === option
+                          ? 'border-blue-500 bg-blue-500'
+                          : 'border-gray-300 bg-white'
+                      }`}>
+                        {answers[currentQuestion.id] === option && (
+                          <div className="w-2 h-2 rounded-full bg-white"></div>
+                        )}
+                      </div>
+                      <span className={`font-medium text-sm leading-relaxed ${
+                        answers[currentQuestion.id] === option
+                          ? 'text-blue-900'
+                          : 'text-gray-700'
+                      }`}>
+                        {option}
+                      </span>
+                    </div>
+                    {answers[currentQuestion.id] === option && (
+                      <div className="absolute top-2 right-2">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
-                <>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="True" id="true" />
-                    <Label htmlFor="true" className="cursor-pointer">True</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="False" id="false" />
-                    <Label htmlFor="false" className="cursor-pointer">False</Label>
-                  </div>
-                </>
+                <div className="grid grid-cols-2 gap-3">
+                  {['True', 'False'].map((option) => (
+                    <div
+                      key={option}
+                      className={`relative p-6 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-center ${
+                        answers[currentQuestion.id] === option
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                      onClick={() => handleAnswerChange(currentQuestion.id, option)}
+                    >
+                      <div className="flex flex-col items-center space-y-2">
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                          answers[currentQuestion.id] === option
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-gray-300 bg-white'
+                        }`}>
+                          {answers[currentQuestion.id] === option && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
+                          )}
+                        </div>
+                        <span className={`font-semibold text-lg ${
+                          answers[currentQuestion.id] === option
+                            ? 'text-blue-900'
+                            : 'text-gray-700'
+                        }`}>
+                          {option}
+                        </span>
+                      </div>
+                      {answers[currentQuestion.id] === option && (
+                        <div className="absolute top-2 right-2">
+                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
-            </RadioGroup>
+            </div>
           </div>
 
           {/* Navigation */}

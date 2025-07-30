@@ -262,19 +262,25 @@ const CourseLearning = () => {
         .eq('chapter_id', chapterId)
         .eq('is_start_quiz', isStartQuiz)
         .eq('is_end_quiz', !isStartQuiz)
-        .single();
+        .limit(1);
 
       if (quizError) throw quizError;
+      
+      if (!quizData || quizData.length === 0) {
+        throw new Error('No quiz found for this chapter');
+      }
+      
+      const quiz = quizData[0]; // Get the first quiz
 
       const { data: questionsData, error: questionsError } = await supabase
         .from('quiz_questions')
         .select('*')
-        .eq('quiz_id', quizData.id)
+        .eq('quiz_id', quiz.id)
         .order('order_index');
 
       if (questionsError) throw questionsError;
 
-      setCurrentQuiz(quizData);
+      setCurrentQuiz(quiz);
       setQuizQuestions(questionsData || []);
       setShowQuiz(true);
     } catch (error) {
@@ -375,14 +381,115 @@ const CourseLearning = () => {
     );
   };
 
+  const canRetakeEndQuiz = (chapterId: string) => {
+    const chapterProgress = progress[chapterId];
+    if (!chapterProgress?.quiz_attempts) return false;
+    
+    // Check if student has taken the end quiz but failed
+    const endQuizAttempts = Object.values(chapterProgress.quiz_attempts).filter((attempt: any) => 
+      attempt.quiz_type === 'end'
+    );
+    
+    // If they have attempts but none passed, they can retake
+    return endQuizAttempts.length > 0 && !endQuizAttempts.some((attempt: any) => attempt.passed);
+  };
+
+  const getLatestEndQuizAttempt = (chapterId: string) => {
+    const chapterProgress = progress[chapterId];
+    if (!chapterProgress?.quiz_attempts) return null;
+    
+    const endQuizAttempts = Object.values(chapterProgress.quiz_attempts).filter((attempt: any) => 
+      attempt.quiz_type === 'end'
+    );
+    
+    if (endQuizAttempts.length === 0) return null;
+    
+    // Return the latest attempt (assuming attempts are stored with timestamps)
+    return endQuizAttempts[endQuizAttempts.length - 1];
+  };
+
+  const hasCompletedAllChapters = () => {
+    // Check if all chapters (except the last one which has the end quiz) are completed
+    const chaptersToComplete = chapters.filter(ch => ch.order_index < chapters.length);
+    
+    return chaptersToComplete.every(chapter => {
+      // For chapters with start quiz, check if start quiz is completed
+      if (chapter.has_start_quiz) {
+        return hasCompletedStartQuiz(chapter.id);
+      }
+      // For chapters without start quiz, check if chapter is marked as completed
+      return progress[chapter.id]?.completed || false;
+    });
+  };
+
   const canAccessChapterContent = (chapter: Chapter) => {
-    if (!chapter.has_start_quiz) return true;
+    // If chapter has no start quiz, check if previous chapters are completed
+    if (!chapter.has_start_quiz) {
+      // For first chapter, always allow access
+      if (chapter.order_index === 1) return true;
+      
+      // For other chapters, check if previous chapter is completed
+      const previousChapter = chapters.find(ch => ch.order_index === chapter.order_index - 1);
+      if (!previousChapter) return true;
+      
+      if (previousChapter.has_start_quiz) {
+        return hasCompletedStartQuiz(previousChapter.id);
+      } else {
+        return progress[previousChapter.id]?.completed || false;
+      }
+    }
+    
+    // If chapter has start quiz, check if it's completed
     return hasCompletedStartQuiz(chapter.id);
   };
 
   const handleChapterSelect = (chapter: Chapter) => {
     setCurrentChapter(chapter);
     markChapterAsStarted(chapter.id);
+  };
+
+  // Helper function to get overall course quiz scores and improvement
+  const getCourseQuizScoresAndImprovement = () => {
+    if (!courseId) return null;
+    
+    // Find the first chapter (start quiz) and last chapter (end quiz)
+    const firstChapter = chapters.find(ch => ch.order_index === 1);
+    const lastChapter = chapters.find(ch => ch.order_index === chapters.length);
+    
+    if (!firstChapter || !lastChapter) return null;
+    
+    const firstChapterProgress = progress[firstChapter.id];
+    const lastChapterProgress = progress[lastChapter.id];
+    
+    let startQuiz = null, endQuiz = null;
+    
+    // Get start quiz from first chapter
+    if (firstChapterProgress?.quiz_attempts) {
+      Object.values(firstChapterProgress.quiz_attempts).forEach((attempt: any) => {
+        if (attempt.quiz_type === 'start') startQuiz = attempt;
+      });
+    }
+    
+    // Get end quiz from last chapter (get the latest attempt)
+    if (lastChapterProgress?.quiz_attempts) {
+      const endQuizAttempts = Object.values(lastChapterProgress.quiz_attempts).filter((attempt: any) => 
+        attempt.quiz_type === 'end'
+      );
+      if (endQuizAttempts.length > 0) {
+        endQuiz = endQuizAttempts[endQuizAttempts.length - 1]; // Get the latest attempt
+      }
+    }
+
+    let improvement = null;
+    if (startQuiz && endQuiz) {
+      const improvementPoints = endQuiz.score - startQuiz.score;
+      improvement = {
+        points: improvementPoints,
+        percentage: startQuiz.score > 0 ? Math.round((improvementPoints / startQuiz.score) * 100) : 0
+      };
+    }
+
+    return { startQuiz, endQuiz, improvement };
   };
 
   if (isLoading) {
@@ -439,6 +546,86 @@ const CourseLearning = () => {
             <h1 className="text-lg font-semibold truncate" style={{ color: '#0F172A' }}>{course.title}</h1>
             <p className="text-sm truncate" style={{ color: '#11283F' }}>{course.category}</p>
           </div>
+        </div>
+
+        {/* Quiz Scores and Improvement Display */}
+        <div className="flex items-center space-x-3 mr-4">
+          {(() => {
+            const quizData = getCourseQuizScoresAndImprovement();
+            if (!quizData) return null;
+            
+            return (
+              <div className="flex items-center space-x-2">
+                {/* Pre-Quiz Score */}
+                {quizData.startQuiz && (
+                  <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold border border-blue-200">
+                    <span>Pre: {quizData.startQuiz.score}%</span>
+                  </div>
+                )}
+                
+                {/* End-Quiz Score and Improvement */}
+                {quizData.endQuiz && (
+                  <div className={`px-2 py-1 rounded text-xs font-semibold border ${
+                    quizData.endQuiz.passed 
+                      ? 'bg-green-100 text-green-800 border-green-200'
+                      : 'bg-red-100 text-red-800 border-red-200'
+                  }`}>
+                    <div className="flex items-center space-x-1">
+                      <span>End: {quizData.endQuiz.score}%</span>
+                      {quizData.endQuiz.passed ? (
+                        quizData.improvement && (
+                          <span className={`text-xs px-1 rounded ${
+                            quizData.improvement.points > 0 
+                              ? 'bg-green-200 text-green-700' 
+                              : quizData.improvement.points < 0 
+                                ? 'bg-red-200 text-red-700'
+                                : 'bg-gray-200 text-gray-700'
+                          }`}>
+                            {quizData.improvement.points > 0 ? '+' : ''}{quizData.improvement.points}
+                          </span>
+                        )
+                      ) : (
+                        <span className="text-xs px-1 rounded bg-red-200 text-red-700">
+                          Failed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex items-center space-x-2 mr-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const currentIndex = chapters.findIndex(ch => ch.id === currentChapter?.id);
+              if (currentIndex > 0) {
+                setCurrentChapter(chapters[currentIndex - 1]);
+              }
+            }}
+            disabled={!currentChapter || chapters.findIndex(ch => ch.id === currentChapter.id) === 0}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const currentIndex = chapters.findIndex(ch => ch.id === currentChapter?.id);
+              if (currentIndex < chapters.length - 1) {
+                setCurrentChapter(chapters[currentIndex + 1]);
+              }
+            }}
+            disabled={!currentChapter || chapters.findIndex(ch => ch.id === currentChapter.id) === chapters.length - 1}
+          >
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -642,8 +829,39 @@ const CourseLearning = () => {
                         style={{ borderColor: '#11283F', color: '#11283F', backgroundColor: 'transparent' }}
                       >
                         <HelpCircle className="h-4 w-4 mr-1" />
-                        Take Quiz
+                        Take Pre-Quiz
                       </Button>
+                    )}
+                    
+                    {/* End Quiz - First attempt */}
+                    {currentChapter.has_end_quiz && hasCompletedAllChapters() && !hasCompletedEndQuiz(currentChapter.id) && !canRetakeEndQuiz(currentChapter.id) && (
+                      <Button 
+                        onClick={() => fetchQuizData(currentChapter.id, false)}
+                        variant="outline"
+                        size="sm"
+                        className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                      >
+                        <HelpCircle className="h-4 w-4 mr-1" />
+                        Take End-Quiz
+                      </Button>
+                    )}
+                    
+                    {/* End Quiz - Retake after failure */}
+                    {currentChapter.has_end_quiz && hasCompletedAllChapters() && canRetakeEndQuiz(currentChapter.id) && (
+                      <div className="flex flex-col space-y-2">
+                        <div className="text-xs text-red-600 font-medium">
+                          Failed - Score: {(getLatestEndQuizAttempt(currentChapter.id) as any)?.score}%
+                        </div>
+                        <Button 
+                          onClick={() => fetchQuizData(currentChapter.id, false)}
+                          variant="outline"
+                          size="sm"
+                          className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+                        >
+                          <HelpCircle className="h-4 w-4 mr-1" />
+                          Retake End-Quiz
+                        </Button>
+                      </div>
                     )}
                     
                     {canAccessChapterContent(currentChapter) && !progress[currentChapter.id]?.completed && (
@@ -658,6 +876,8 @@ const CourseLearning = () => {
                     )}
                   </div>
                 </div>
+
+=======
 
                 {/* Chapter Navigation */}
                 <div className="flex justify-between">
