@@ -782,8 +782,10 @@ const CourseLearning = () => {
                     <h1 className="text-2xl font-bold mb-2">
                       {currentChapter.order_index}. {currentChapter.title}
                     </h1>
-                    <p className="text-muted-foreground mb-4">{currentChapter.description}</p>
-                    
+ <div
+  className="text-muted-foreground mb-4"
+  dangerouslySetInnerHTML={{ __html: currentChapter.description }}
+/>                                        
                     <div className="flex items-center space-x-2">
                       {progress[currentChapter.id]?.completed ? (
                         <Badge className="bg-green-600">
