@@ -10,6 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Plus, Video, FileText, ArrowLeft, Upload, Trash2, Edit } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import QuizManager from '@/components/QuizManager';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface Chapter {
   id: string;
@@ -325,15 +327,29 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({ courseId, courseTitle, 
 
               <div className="space-y-2">
                 <Label htmlFor="chapter-description">Description</Label>
-                <Textarea
+                <ReactQuill
                   id="chapter-description"
                   value={chapterForm.description}
-                  onChange={(e) => setChapterForm({ ...chapterForm, description: e.target.value })}
+                  onChange={(value) => setChapterForm({ ...chapterForm, description: value })}
+                  modules={{
+                    toolbar: [
+                      [{ 'font': [] }, { 'size': [] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'color': [] }, { 'background': [] }],
+                      [{ 'align': [] }],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      ['link'],
+                      ['clean']
+                    ]
+                  }}
+                  formats={[
+                    'font', 'size', 'bold', 'italic', 'underline', 'strike',
+                    'color', 'background', 'align', 'list', 'bullet', 'link'
+                  ]}
                   placeholder="Brief description of the chapter"
-                  rows={2}
+                  style={{ height: '120px', marginBottom: '80px' }}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="video-upload">Video Upload</Label>
                 <div className="flex items-center space-x-2">
@@ -352,16 +368,33 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({ courseId, courseTitle, 
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="chapter-content">Text Content</Label>
-                <Textarea
-                  id="chapter-content"
-                  value={chapterForm.content}
-                  onChange={(e) => setChapterForm({ ...chapterForm, content: e.target.value })}
-                  placeholder="Chapter text content, notes, or materials"
-                  rows={6}
-                />
-              </div>
+            <div className="space-y-2">
+             <Label htmlFor="chapter-content">Text Content</Label>
+              <ReactQuill
+                id="chapter-content"
+                value={chapterForm.content}
+                onChange={(value) => setChapterForm({ ...chapterForm, content: value })}
+                modules={{
+                  toolbar: [
+                    [{ 'font': [] }, { 'size': [] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': [] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'image'],
+                    ['blockquote', 'code-block'],
+                    ['clean']
+                  ]
+                }}
+                formats={[
+                  'font', 'size', 'bold', 'italic', 'underline', 'strike',
+                  'color', 'background', 'align', 'list', 'bullet', 'link', 'image',
+                  'blockquote', 'code-block'
+                ]}
+                placeholder="Chapter text content, notes, or materials"
+                style={{ height: '200px', marginBottom: '80px' }}
+              />
+            </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
