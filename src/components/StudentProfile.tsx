@@ -114,19 +114,26 @@ const StudentProfile = () => {
   };
 
   return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader>
+    <Card className="max-w-7xl mx-auto border-[#9FABBA]/30 shadow-lg overflow-y-auto">
+      <CardHeader className="pb-8">
         <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <User className="h-6 w-6 text-primary" />
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-gradient-to-br from-[#11283F] to-[#4B6584] rounded-xl shadow-lg">
+              <User className="h-6 w-6 text-white" />
+            </div>
             <div>
-              <CardTitle>Student Profile</CardTitle>
-              <CardDescription>Manage your personal information and academic details</CardDescription>
+              <CardTitle className="text-2xl font-bold text-[#11283F]">Student Profile</CardTitle>
+              <CardDescription className="text-[#4B6584] text-base mt-2">Manage your personal information and academic details</CardDescription>
             </div>
           </div>
           <Button
             variant={isEditing ? "outline" : "default"}
             onClick={() => setIsEditing(!isEditing)}
+            className={`font-medium px-6 py-2.5 rounded-xl transition-all duration-200 ${
+              isEditing 
+                ? 'border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10 hover:border-[#4B6584]'
+                : 'bg-[#11283F] hover:bg-[#1A344F] text-white shadow-lg'
+            }`}
           >
             <Edit className="h-4 w-4 mr-2" />
             {isEditing ? 'Cancel' : 'Edit Profile'}
@@ -135,40 +142,43 @@ const StudentProfile = () => {
       </CardHeader>
       
       <CardContent>
-        <form onSubmit={handleSave} className="space-y-6">
+        <form onSubmit={handleSave} className="space-y-10">
           {/* Personal Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center space-x-2">
-              <User className="h-5 w-5" />
-              <span>Personal Information</span>
-            </h3>
+          <div className="space-y-6">
+            <div className="flex items-center space-x-3 pb-4 border-b border-[#9FABBA]/30">
+              <div className="p-2 bg-[#11283F]/10 rounded-lg">
+                <User className="h-5 w-5 text-[#11283F]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#11283F]">Personal Information</h3>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label htmlFor="name" className="text-sm font-semibold text-[#11283F]">Full Name</Label>
                 <Input
                   id="name"
                   value={profileForm.name}
                   onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
                   disabled={!isEditing}
                   required
+                  className={`h-12 border-[#9FABBA]/50 rounded-xl ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+              <div className="space-y-3">
+                <Label htmlFor="email" className="text-sm font-semibold text-[#11283F]">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={profileForm.email}
                   disabled={true}
-                  className="bg-muted"
+                  className="h-12 bg-slate-50 border-[#9FABBA]/30 rounded-xl"
                 />
-                <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+                <p className="text-xs text-[#4B6584]">Email cannot be changed</p>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+              <div className="space-y-3">
+                <Label htmlFor="phone" className="text-sm font-semibold text-[#11283F]">Phone Number</Label>
                 <Input
                   id="phone"
                   type="tel"
@@ -176,53 +186,58 @@ const StudentProfile = () => {
                   onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                   disabled={!isEditing}
                   placeholder="+1 (555) 123-4567"
+                  className={`h-12 border-[#9FABBA]/50 rounded-xl ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="date_of_birth">Date of Birth</Label>
+              <div className="space-y-3">
+                <Label htmlFor="date_of_birth" className="text-sm font-semibold text-[#11283F]">Date of Birth</Label>
                 <Input
                   id="date_of_birth"
                   type="date"
                   value={profileForm.date_of_birth}
                   onChange={(e) => setProfileForm({ ...profileForm, date_of_birth: e.target.value })}
                   disabled={!isEditing}
+                  className={`h-12 border-[#9FABBA]/50 rounded-xl ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
+            <div className="space-y-3">
+              <Label htmlFor="address" className="text-sm font-semibold text-[#11283F]">Address</Label>
               <Textarea
                 id="address"
                 value={profileForm.address}
                 onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
                 disabled={!isEditing}
                 placeholder="Enter your full address"
-                rows={2}
+                rows={3}
+                className={`border-[#9FABBA]/50 rounded-xl resize-none ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}
               />
             </div>
           </div>
 
           {/* Academic Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center space-x-2">
-              <GraduationCap className="h-5 w-5" />
-              <span>Academic Information</span>
-            </h3>
+          <div className="space-y-6">
+            <div className="flex items-center space-x-3 pb-4 border-b border-[#9FABBA]/30">
+              <div className="p-2 bg-[#11283F]/10 rounded-lg">
+                <GraduationCap className="h-5 w-5 text-[#11283F]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#11283F]">Academic Information</h3>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="university">University</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label htmlFor="university" className="text-sm font-semibold text-[#11283F]">University</Label>
                 <Select
                   value={profileForm.university_id}
                   onValueChange={(value) => setProfileForm({ ...profileForm, university_id: value })}
                   disabled={!isEditing}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={`h-12 border-[#9FABBA]/50 rounded-xl ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}>
                     <SelectValue placeholder="Select your university" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl border-[#9FABBA]/50">
                     <SelectItem value="no_university">No University</SelectItem>
                     {universities.map((uni) => (
                       <SelectItem key={uni.id} value={uni.id}>
@@ -233,28 +248,29 @@ const StudentProfile = () => {
                 </Select>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="student_id">Student ID</Label>
+              <div className="space-y-3">
+                <Label htmlFor="student_id" className="text-sm font-semibold text-[#11283F]">Student ID</Label>
                 <Input
                   id="student_id"
                   value={profileForm.student_id}
                   onChange={(e) => setProfileForm({ ...profileForm, student_id: e.target.value })}
                   disabled={!isEditing}
                   placeholder="Your university student ID"
+                  className={`h-12 border-[#9FABBA]/50 rounded-xl ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="year_of_study">Year of Study</Label>
+              <div className="space-y-3">
+                <Label htmlFor="year_of_study" className="text-sm font-semibold text-[#11283F]">Year of Study</Label>
                 <Select
                   value={profileForm.year_of_study}
                   onValueChange={(value) => setProfileForm({ ...profileForm, year_of_study: value })}
                   disabled={!isEditing}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={`h-12 border-[#9FABBA]/50 rounded-xl ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}>
                     <SelectValue placeholder="Select year" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl border-[#9FABBA]/50">
                     <SelectItem value="1">1st Year</SelectItem>
                     <SelectItem value="2">2nd Year</SelectItem>
                     <SelectItem value="3">3rd Year</SelectItem>
@@ -266,24 +282,30 @@ const StudentProfile = () => {
                 </Select>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="major">Major/Field of Study</Label>
+              <div className="space-y-3">
+                <Label htmlFor="major" className="text-sm font-semibold text-[#11283F]">Major/Field of Study</Label>
                 <Input
                   id="major"
                   value={profileForm.major}
                   onChange={(e) => setProfileForm({ ...profileForm, major: e.target.value })}
                   disabled={!isEditing}
                   placeholder="e.g., Computer Science, Medicine"
+                  className={`h-12 border-[#9FABBA]/50 rounded-xl ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}
                 />
               </div>
             </div>
           </div>
 
           {/* Bio Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">About Me</h3>
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
+          <div className="space-y-6">
+            <div className="flex items-center space-x-3 pb-4 border-b border-[#9FABBA]/30">
+              <div className="p-2 bg-[#11283F]/10 rounded-lg">
+                <User className="h-5 w-5 text-[#11283F]" />
+              </div>
+              <h3 className="text-xl font-bold text-[#11283F]">About Me</h3>
+            </div>
+            <div className="space-y-3">
+              <Label htmlFor="bio" className="text-sm font-semibold text-[#11283F]">Bio</Label>
               <Textarea
                 id="bio"
                 value={profileForm.bio}
@@ -291,12 +313,13 @@ const StudentProfile = () => {
                 disabled={!isEditing}
                 placeholder="Tell us a bit about yourself..."
                 rows={4}
+                className={`border-[#9FABBA]/50 rounded-xl resize-none ${isEditing ? 'focus:border-[#11283F] focus:ring-[#11283F]/20' : 'bg-slate-50'}`}
               />
             </div>
           </div>
 
           {isEditing && (
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end space-x-4 pt-6 border-t border-[#9FABBA]/30">
               <Button
                 type="button"
                 variant="outline"
@@ -304,10 +327,15 @@ const StudentProfile = () => {
                   setIsEditing(false);
                   loadProfileData();
                 }}
+                className="border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10 hover:border-[#4B6584] font-medium px-6 py-2.5 rounded-xl"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="bg-[#11283F] hover:bg-[#1A344F] text-white font-medium px-8 py-2.5 rounded-xl shadow-lg disabled:opacity-50"
+              >
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? 'Saving...' : 'Save Changes'}
               </Button>
