@@ -494,7 +494,10 @@ const AdminDashboard = () => {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-semibold">{course.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">{course.description}</p>
+<div
+  className="text-sm text-muted-foreground mb-2"
+  dangerouslySetInnerHTML={{ __html: course.description }}
+/>
                           <div className="flex items-center space-x-4 text-sm">
                             <span className="bg-primary/10 text-primary px-2 py-1 rounded">
                               {course.type}
