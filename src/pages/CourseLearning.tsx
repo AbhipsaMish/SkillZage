@@ -387,10 +387,11 @@ const CourseLearning = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8FAFC' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading course...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" 
+               style={{ borderColor: '#11283F' }}></div>
+          <p style={{ color: '#11283F' }}>Loading course...</p>
         </div>
       </div>
     );
@@ -398,11 +399,12 @@ const CourseLearning = () => {
 
   if (!course) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8FAFC' }}>
         <div className="text-center">
-          <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Course Not Found</h2>
-          <Button onClick={() => navigate('/dashboard')}>
+          <BookOpen className="h-16 w-16 mx-auto mb-4" style={{ color: '#64748B' }} />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: '#0F172A' }}>Course Not Found</h2>
+          <Button onClick={() => navigate('/dashboard')}
+                  style={{ backgroundColor: '#11283F', color: '#FFFFFF', border: 'none' }}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
@@ -412,34 +414,38 @@ const CourseLearning = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F8FAFC' }}>
       {/* Header */}
-      <header className="h-16 border-b bg-card flex items-center px-4 md:px-6 sticky top-0 z-40">
+      <header className="h-16 border-b flex items-center px-4 md:px-6 sticky top-0 z-40" 
+              style={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0' }}>
         <div className="flex items-center space-x-4 flex-1">
           <Button 
             variant="ghost" 
             size="sm"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="md:hidden"
+            style={{ color: '#11283F' }}
           >
             <Menu className="h-4 w-4" />
           </Button>
           
-          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}
+                  style={{ color: '#11283F' }}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Dashboard
           </Button>
           
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-semibold truncate">{course.title}</h1>
-            <p className="text-sm text-muted-foreground truncate">{course.category}</p>
+            <h1 className="text-lg font-semibold truncate" style={{ color: '#0F172A' }}>{course.title}</h1>
+            <p className="text-sm truncate" style={{ color: '#11283F' }}>{course.category}</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-4">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-medium">{completionPercentage}% Complete</p>
-            <Progress value={completionPercentage} className="w-24 h-1.5" />
+            <p className="text-sm font-medium" style={{ color: '#0F172A' }}>{completionPercentage}% Complete</p>
+            <Progress value={completionPercentage} className="w-24 h-1.5" 
+                     style={{ backgroundColor: '#E2E8F0' , color: '#11283F' }} />
           </div>
         </div>
       </header>
@@ -447,20 +453,22 @@ const CourseLearning = () => {
       <div className="flex flex-1 relative">
         {/* Sidebar */}
         <div className={`${sidebarOpen ? 'w-80' : 'w-0'} md:w-80 transition-all duration-300 flex-shrink-0 relative`}>
-          <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 absolute inset-0 bg-card border-r transition-transform duration-300 z-30`}>
-            <div className="p-4 border-b bg-muted/50">
+          <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 absolute inset-0 border-r transition-transform duration-300 z-30`}
+               style={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0' }}>
+            <div className="p-4 border-b" style={{ backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }}>
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-sm">Course Content</h2>
+                <h2 className="font-semibold text-sm" style={{ color: '#0F172A' }}>Course Content</h2>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   className="md:hidden"
                   onClick={() => setSidebarOpen(false)}
+                  style={{ color: '#11283F' }}
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs mt-1" style={{ color: '#64748B' }}>
                 {chapters.filter(ch => progress[ch.id]?.completed).length} of {chapters.length} completed
               </p>
             </div>
@@ -475,42 +483,58 @@ const CourseLearning = () => {
                   return (
                     <div
                       key={chapter.id}
-                      className={`p-3 rounded-lg border cursor-pointer transition-all group ${
-                        isCurrent 
-                          ? 'border-primary bg-primary/10 shadow-sm' 
-                          : 'border-transparent hover:border-primary/30 hover:bg-muted/50'
-                      }`}
+                      className={`p-3 rounded-lg border cursor-pointer transition-all group`}
+                      style={{
+                        borderColor: isCurrent ? '#11283F' : 'transparent',
+                        backgroundColor: isCurrent ? '#F8FAFC' : 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isCurrent) {
+                          e.currentTarget.style.borderColor = '#64748B';
+                          e.currentTarget.style.backgroundColor = '#F8FAFC';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isCurrent) {
+                          e.currentTarget.style.borderColor = 'transparent';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
                       onClick={() => handleChapterSelect(chapter)}
                     >
                       <div className="flex items-start space-x-3">
                         <div className="flex-shrink-0 mt-0.5">
                           {isCompleted ? (
-                            <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center">
+                            <div className="w-5 h-5 rounded-full flex items-center justify-center" 
+                                 style={{ backgroundColor: '#11283F' }}>
                               <CheckCircle className="h-3 w-3 text-white" />
                             </div>
                           ) : isStarted ? (
-                            <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                            <div className="w-5 h-5 rounded-full flex items-center justify-center" 
+                                 style={{ backgroundColor: '#64748B' }}>
                               <PlayCircle className="h-3 w-3 text-white" />
                             </div>
                           ) : (
-                            <div className="w-5 h-5 rounded-full border-2 border-muted-foreground flex items-center justify-center">
-                              <span className="text-xs font-medium">{chapter.order_index}</span>
+                            <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                                 style={{ borderColor: '#64748B' }}>
+                              <span className="text-xs font-medium" style={{ color: '#64748B' }}>{chapter.order_index}</span>
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className={`font-medium text-sm leading-tight ${isCurrent ? 'text-primary' : ''}`}>
+                          <p className={`font-medium text-sm leading-tight ${isCurrent ? 'text-primary' : ''}`}
+                             style={{ color: isCurrent ? '#11283F' : '#0F172A' }}>
                             {chapter.title}
                           </p>
                           <div className="flex items-center space-x-1 mt-1">
                             {chapter.video_url && (
-                              <PlayCircle className="h-3 w-3 text-muted-foreground" />
+                              <PlayCircle className="h-3 w-3" style={{ color: '#64748B' }} />
                             )}
                             {chapter.content && (
-                              <FileText className="h-3 w-3 text-muted-foreground" />
+                              <FileText className="h-3 w-3" style={{ color: '#64748B' }} />
                             )}
                             {chapter.has_start_quiz && (
-                              <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                              <HelpCircle className="h-3 w-3" style={{ color: '#64748B' }} />
                             )}
                           </div>
                         </div>
@@ -528,7 +552,7 @@ const CourseLearning = () => {
           {currentChapter ? (
             <div className="flex-1 flex flex-col">
               {/* Video/Content Area */}
-              <div className="bg-black relative">
+              <div className="relative" style={{ backgroundColor: '#0F172A' }}>
                 {currentChapter.video_url && canAccessChapterContent(currentChapter) ? (
                   <div className="aspect-video">
                     {currentChapter.video_url.includes('youtube.com') || currentChapter.video_url.includes('youtu.be') ? (
@@ -568,19 +592,19 @@ const CourseLearning = () => {
                     )}
                   </div>
                 ) : (
-                  <div className="aspect-video flex items-center justify-center bg-muted">
+                  <div className="aspect-video flex items-center justify-center" style={{ backgroundColor: '#E2E8F0' }}>
                     <div className="text-center">
                       {!canAccessChapterContent(currentChapter) ? (
                         <>
-                          <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                          <h3 className="text-lg font-semibold mb-2">Complete the Quiz First</h3>
-                          <p className="text-muted-foreground">You need to pass the pre-chapter quiz to access this content.</p>
+                          <Lock className="h-12 w-12 mx-auto mb-4" style={{ color: '#64748B' }} />
+                          <h3 className="text-lg font-semibold mb-2" style={{ color: '#0F172A' }}>Complete the Quiz First</h3>
+                          <p style={{ color: '#11283F' }}>You need to pass the pre-chapter quiz to access this content.</p>
                         </>
                       ) : (
                         <>
-                          <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                          <h3 className="text-lg font-semibold mb-2">Text-Based Chapter</h3>
-                          <p className="text-muted-foreground">This chapter contains reading material and exercises.</p>
+                          <FileText className="h-12 w-12 mx-auto mb-4" style={{ color: '#64748B' }} />
+                          <h3 className="text-lg font-semibold mb-2" style={{ color: '#0F172A' }}>Text-Based Chapter</h3>
+                          <p style={{ color: '#11283F' }}>This chapter contains reading material and exercises.</p>
                         </>
                       )}
                     </div>
@@ -589,22 +613,22 @@ const CourseLearning = () => {
               </div>
 
               {/* Chapter Info & Actions */}
-              <div className="p-6 border-b">
+              <div className="p-6 border-b" style={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0' }}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h1 className="text-2xl font-bold mb-2">
+                    <h1 className="text-2xl font-bold mb-2" style={{ color: '#0F172A' }}>
                       {currentChapter.order_index}. {currentChapter.title}
                     </h1>
-                    <p className="text-muted-foreground mb-4">{currentChapter.description}</p>
+                    <p className="mb-4" style={{ color: '#11283F' }}>{currentChapter.description}</p>
                     
                     <div className="flex items-center space-x-2">
                       {progress[currentChapter.id]?.completed ? (
-                        <Badge className="bg-green-600">
+                        <Badge style={{ backgroundColor: '#11283F', color: '#FFFFFF' }}>
                           <CheckCircle className="h-3 w-3 mr-1" />
                           Completed
                         </Badge>
                       ) : (
-                        <Badge variant="secondary">In Progress</Badge>
+                        <Badge style={{ backgroundColor: '#64748B', color: '#FFFFFF' }}>In Progress</Badge>
                       )}
                     </div>
                   </div>
@@ -615,6 +639,7 @@ const CourseLearning = () => {
                         onClick={() => fetchQuizData(currentChapter.id, true)}
                         variant="outline"
                         size="sm"
+                        style={{ borderColor: '#11283F', color: '#11283F', backgroundColor: 'transparent' }}
                       >
                         <HelpCircle className="h-4 w-4 mr-1" />
                         Take Quiz
@@ -625,6 +650,7 @@ const CourseLearning = () => {
                       <Button 
                         onClick={() => markChapterAsCompleted(currentChapter.id)}
                         size="sm"
+                        style={{ backgroundColor: '#11283F', color: '#FFFFFF', border: 'none' }}
                       >
                         <CheckCircle className="h-4 w-4 mr-1" />
                         Mark Complete
@@ -645,6 +671,11 @@ const CourseLearning = () => {
                       }
                     }}
                     disabled={chapters.findIndex(ch => ch.id === currentChapter.id) === 0}
+                    style={{ 
+                      borderColor: '#64748B', 
+                      color: chapters.findIndex(ch => ch.id === currentChapter.id) === 0 ? '#64748B' : '#1E40AF',
+                      backgroundColor: 'transparent'
+                    }}
                   >
                     <ArrowLeft className="h-4 w-4 mr-1" />
                     Previous
@@ -660,6 +691,11 @@ const CourseLearning = () => {
                       }
                     }}
                     disabled={chapters.findIndex(ch => ch.id === currentChapter.id) === chapters.length - 1}
+                    style={{ 
+                      borderColor: '#64748B', 
+                      color: chapters.findIndex(ch => ch.id === currentChapter.id) === chapters.length - 1 ? '#64748B' : '#1E40AF',
+                      backgroundColor: 'transparent'
+                    }}
                   >
                     Next
                     <ArrowRight className="h-4 w-4 ml-1" />
@@ -669,20 +705,21 @@ const CourseLearning = () => {
 
               {/* Reading Material */}
               {currentChapter.content && canAccessChapterContent(currentChapter) && (
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Reading Material</h3>
-                  <div className="prose prose-sm max-w-none bg-card p-6 rounded-lg border">
-                    <div className="whitespace-pre-wrap">{currentChapter.content}</div>
+                <div className="p-6" style={{ backgroundColor: '#F8FAFC' }}>
+                  <h3 className="text-lg font-semibold mb-4" style={{ color: '#0F172A' }}>Reading Material</h3>
+                  <div className="prose prose-sm max-w-none p-6 rounded-lg border" 
+                       style={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0' }}>
+                    <div className="whitespace-pre-wrap" style={{ color: '#0F172A' }}>{currentChapter.content}</div>
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
               <div className="text-center">
-                <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Welcome to {course.title}!</h3>
-                <p className="text-muted-foreground mb-4">Select a chapter from the sidebar to begin learning</p>
+                <BookOpen className="h-16 w-16 mx-auto mb-4" style={{ color: '#64748B' }} />
+                <h3 className="text-xl font-semibold mb-2" style={{ color: '#0F172A' }}>Welcome to {course.title}!</h3>
+                <p className="mb-4" style={{ color: '#11283F' }}>Select a chapter from the sidebar to begin learning</p>
               </div>
             </div>
           )}
@@ -692,10 +729,11 @@ const CourseLearning = () => {
       {/* Quiz Modal */}
       {showQuiz && currentQuiz && quizQuestions.length > 0 && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="p-6 border-b">
+          <div className="rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden" 
+               style={{ backgroundColor: '#FFFFFF' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#E2E8F0' }}>
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold" style={{ color: '#0F172A' }}>
                   {currentQuiz.is_start_quiz ? "Pre-Chapter Quiz" : "Chapter Test"}: {currentQuiz.title}
                 </h2>
                 <Button 
@@ -705,21 +743,17 @@ const CourseLearning = () => {
                     setCurrentQuiz(null);
                     setQuizQuestions([]);
                   }}
+                  style={{ color: '#11283F' }}
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-8rem)]">
               <QuizTaker
                 quiz={currentQuiz}
                 questions={quizQuestions}
-                onQuizComplete={handleQuizComplete}
-                onBack={() => {
-                  setShowQuiz(false);
-                  setCurrentQuiz(null);
-                  setQuizQuestions([]);
-                }}
+                onComplete={handleQuizComplete}
               />
             </div>
           </div>
@@ -727,26 +761,43 @@ const CourseLearning = () => {
       )}
 
       {/* Improvement Tracker Modal */}
-      {showImprovementTracker && courseId && (
+      {showImprovementTracker && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-background rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="p-6 border-b">
+          <div className="rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden" 
+               style={{ backgroundColor: '#FFFFFF' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#E2E8F0' }}>
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold">Your Learning Progress</h2>
+                <h2 className="text-xl font-bold" style={{ color: '#0F172A' }}>
+                  Learning Progress Tracker
+                </h2>
                 <Button 
                   variant="ghost" 
                   onClick={() => setShowImprovementTracker(false)}
+                  style={{ color: '#11283F' }}
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
-              <ImprovementTracker courseId={courseId} />
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-8rem)]">
+              <ImprovementTracker
+                courseId={courseId!}
+                chapters={chapters}
+                progress={progress}
+              />
             </div>
           </div>
         </div>
       )}
+
+      {/* Floating Action Button for Improvement Tracker */}
+      <Button
+        className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg"
+        onClick={() => setShowImprovementTracker(true)}
+        style={{ backgroundColor: '#11283F', color: '#FFFFFF', border: 'none' }}
+      >
+        <Clock className="h-6 w-6" />
+      </Button>
     </div>
   );
 };
