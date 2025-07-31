@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { BookOpen, Clock, Star, ShoppingCart, Play, Lock, User, GraduationCap, Settings, Menu, X } from 'lucide-react';
 import StudentProfile from '@/components/StudentProfile';
+import logo from "../../src/assets/skillzage-logo-final.svg";
+import Footer from "../../components/Footer"
 
 interface Course {
   id: string;
@@ -368,11 +370,16 @@ const StudentDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
       {/* Header */}
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
-              <div className="p-1.5 sm:p-2 bg-blue-900 rounded-xl shadow-lg flex-shrink-0">
-                <GraduationCap className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 max-h-[100px]">
+            <div className="flex items-center flex-1">
+               <img 
+                 src={logo} 
+                 alt="Skillzage Logo" 
+                 className="logo lg:mb-2" 
+                 style={{ height: "100px", width: "100px", objectFit: "contain" }} // keeps image large
+                 loading="lazy"
+        />
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Skillzage</h1>
