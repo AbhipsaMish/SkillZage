@@ -239,13 +239,13 @@ const StudentDashboard = () => {
     isUniversityCourse?: boolean; 
   }) => {
     const progress = courseProgress[course.id];
-    
+
     return (
-      <Card className="group relative overflow-hidden border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white">
+      <Card className="group relative overflow-hidden border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white p-4 sm:p-6 md:p-8 flex flex-col h-full">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
+
         {/* Thumbnail Section */}
-        <div className="relative h-40 sm:h-48 w-full overflow-hidden">
+        <div className="relative h-36 xs:h-40 sm:h-48 md:h-56 lg:h-64 w-full overflow-hidden rounded-xl mb-4 sm:mb-6">
           {course.thumbnail_url ? (
             <img 
               src={course.thumbnail_url} 
@@ -253,7 +253,7 @@ const StudentDashboard = () => {
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full bg-#11283F-50 flex items-center justify-center">
+            <div className="w-full h-full bg-slate-800/10 flex items-center justify-center">
               <div className="text-center space-y-2">
                 <div className="p-3 bg-white/80 rounded-full mx-auto w-fit backdrop-blur-sm">
                   <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500" />
@@ -263,21 +263,21 @@ const StudentDashboard = () => {
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
+
           {/* Course badges overlay */}
           <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex flex-col space-y-1 sm:space-y-2">
             {isUniversityCourse && (
-              <Badge className="bg-slate-800/90 hover:bg-slate-900 text-white border-0 text-xs px-1.5 sm:px-2 py-1 backdrop-blur-sm">
+              <Badge className="bg-slate-800/90 hover:bg-slate-900 text-white border-0 text-xs px-2 py-1 backdrop-blur-sm">
                 University Course
               </Badge>
             )}
             {course.is_free ? (
-              <Badge className="bg-emerald-500/90 hover:bg-emerald-600 text-white border-0 text-xs px-1.5 sm:px-2 py-1 font-semibold backdrop-blur-sm">
+              <Badge className="bg-emerald-500/90 hover:bg-emerald-600 text-white border-0 text-xs px-2 py-1 font-semibold backdrop-blur-sm">
                 FREE
               </Badge>
             ) : (
               course.type === 'public' && !isPurchased && (
-                <Badge className="bg-white/90 text-slate-700 border-0 text-xs px-1.5 sm:px-2 py-1 font-medium backdrop-blur-sm">
+                <Badge className="bg-white/90 text-slate-700 border-0 text-xs px-2 py-1 font-medium backdrop-blur-sm">
                   {course.currency} {course.price}
                 </Badge>
               )
@@ -285,26 +285,25 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        <CardHeader className="relative z-10 pb-3 p-4 sm:p-6">
-          <div className="space-y-2 sm:space-y-3">
-            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
-              <BookOpen className="h-3 w-3 mr-1" />
+        <CardHeader className="relative z-10 pb-2 p-2 sm:p-4 md:p-6">
+          <div className="space-y-2 sm:space-y-4">
+            <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
               {course.category}
             </div>
-            <CardTitle className="text-base sm:text-lg font-bold text-slate-800 group-hover:text-slate-900 transition-colors line-clamp-2">
+            <CardTitle className="text-base sm:text-lg md:text-xl font-bold text-slate-800 group-hover:text-slate-900 transition-colors line-clamp-2">
               {course.title}
             </CardTitle>
             <div
-  className="line-clamp-2 text-slate-600 text-sm leading-relaxed"
-  dangerouslySetInnerHTML={{ __html: course.description }}
-/>
+              className="line-clamp-2 text-slate-600 text-sm md:text-base leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: course.description }}
+            />
           </div>
         </CardHeader>
-        <CardContent className="relative z-10 pt-0 p-4 sm:p-6">
-          <div className="space-y-3 sm:space-y-4">
+        <CardContent className="relative z-10 pt-0 p-4 sm:p-6 md:p-8 flex flex-col flex-1">
+          <div className="space-y-3 sm:space-y-5 flex-1">
             {/* Progress bar for purchased courses */}
             {(isPurchased || isUniversityCourse) && progress && (
-              <div className="space-y-2 sm:space-y-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <div className="sm:space-y-3 p-0">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-slate-700">Progress</span>
                   <span className="text-sm font-bold text-slate-800">{progress.completion_percentage}%</span>
@@ -324,34 +323,35 @@ const StudentDashboard = () => {
                 </p>
               </div>
             )}
-            
+
             <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-2 space-y-2 sm:space-y-0">
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full">
                 {(isPurchased || isUniversityCourse) ? (
                   <Button 
                     size="sm" 
                     asChild
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-lg text-xs w-full sm:w-auto"
+                    className="w-full bg-[#11283F] hover:bg-[#1A344F] text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg text-xs py-3"
                   >
                     <Link to={`/course/${course.id}`}>
-                      <Play className="h-4 w-4 mr-2" />
-                      Continue Learning
+                      <Play className="h-4 w-4 mr-1" />
+                      <span className="hidden xs:inline">Continue Learning</span>
+                      <span className="xs:hidden">Learn</span>
                     </Link>
                   </Button>
                 ) : (
-                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                  <div className="flex flex-col sm:flex-row w-full sm:space-x-2 space-y-2 sm:space-y-0">
                     <Button 
                       variant="outline" 
                       size="sm"
                       onClick={() => handlePreviewCourse(course)}
-                      className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-medium px-3 py-2 rounded-lg transition-all duration-200 w-full sm:w-auto"
+                      className="w-full sm:w-1/2 border-slate-300 text-slate-700 hover:bg-[#1A344F] hover:border-slate-400 font-medium px-3 py-3 rounded-lg transition-all duration-200"
                     >
                       Preview
                     </Button>
                     <Button 
                       size="sm" 
                       onClick={() => handlePurchaseCourse(course.id, course)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-lg text-xs w-full sm:w-auto"
+                      className="w-full sm:w-1/2 bg-[#11283F] hover:bg-[#1A344F] text-white font-medium px-3 py-3 rounded-lg transition-all duration-200 hover:shadow-lg text-xs"
                     >
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       {course.is_free ? 'Get Free' : 'Buy Now'}
@@ -367,71 +367,74 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <>
+    <div className="min-h-screen bg-[#F5F5F5] from-slate-50 to-white">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-          <div className="flex justify-between items-center">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 max-h-[100px]">
-            <div className="flex items-center flex-1">
-               <img 
-                 src={logo} 
-                 alt="Skillzage Logo" 
-                 className="logo lg:mb-2" 
-                 style={{ height: "100px", width: "100px", objectFit: "contain" }} // keeps image large
-                 loading="lazy"
-        />
+     <header className="border-b border-[#9FABBA]/30 bg-white sticky top-0 z-50">
+        <div className="px-2 sm:px-4 lg:px-6 py-0">
+          <div className="flex justify-between items-center max-h-[100px]">
+            <div className="flex items-center flex-1 min-w-0">
+              <div>
+                <img 
+                  src={logo} 
+                  alt="Skillzage Logo" 
+                  className="logo" 
+                  style={{ height: "100px", width: "100px", objectFit: "contain" }}
+                  loading="lazy"
+                />
               </div>
-              <div className="min-w-0 flex-1">
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Skillzage</h1>
-                <p className="text-xs sm:text-sm text-slate-600 font-medium truncate">
-                  Welcome back, <span className="text-slate-800">{profile?.name}</span>
+              <div className="leading-tight">
+                <h1 className="text-xl lg:text-2xl font-bold text-[#000000]">Skillzage</h1>
+                <p className="text-sm text-[#000000] font-medium">
+                  Welcome back, <span className="text-[#000000] font-medium">{profile?.name}</span>
                 </p>
               </div>
             </div>
             
             {/* Mobile menu button */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2 lg:gap-4">
               {university && (
-                <Badge className="hidden sm:flex bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded-lg transition-all duration-200 hover:shadow-lg text-xs">
-                  <User className="h-3 w-3 mr-1" />
-                  <span className="truncate max-w-20">{university.name}</span>
+                <Badge className="hidden sm:flex items-center space-x-2 text-[#11283F] border-[#9FABBA]/30 px-3 lg:px-4 py-1.5 rounded-full font-medium transition-all duration-200">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline truncate max-w-20">{university.name}</span>
                 </Badge>
               )}
               
               {/* Desktop Navigation */}
-              <div className="hidden sm:flex items-center space-x-3">
+              <div className="hidden sm:flex items-center gap-3">
                 <Button
                   variant={activeTab === 'profile' ? 'default' : 'outline'}
                   onClick={() => setActiveTab('profile')}
                   size="sm"
-                  className={`text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
+                  className={`font-medium px-4 lg:px-5 py-1.5 rounded-xl transition-all duration-200 ${
                     activeTab === 'profile' 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' 
-                      : 'border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'
+                      ? 'bg-[#11283F] hover:bg-[#1A344F] text-white shadow-lg' 
+                      : 'border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10 hover:border-[#4B6584]'
                   }`}
                 >
                   <Settings className="h-4 w-4 mr-2" />
-                  Profile
+                  <span className="hidden sm:inline">Profile</span>
                 </Button>
                 <Button
                   variant={activeTab === 'courses' ? 'default' : 'outline'}
                   onClick={() => setActiveTab('courses')}
                   size="sm"
-                  className={`text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
+                  className={`font-medium px-4 lg:px-5 py-1.5 rounded-xl transition-all duration-200 ${
                     activeTab === 'courses' 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' 
-                      : 'border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'
+                      ? 'bg-[#11283F] hover:bg-[#1A344F] text-white shadow-lg' 
+                      : 'border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10 hover:border-[#4B6584]'
                   }`}
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
-                  Courses
+                  <span className="hidden sm:inline">Courses</span>
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={signOut}
-                  className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200"
+                  className="border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10 hover:border-[#4B6584] font-medium px-4 lg:px-5 py-1.5 rounded-xl transition-all duration-200"
                 >
-                  Sign Out
+                  <span className="hidden sm:inline">Sign Out</span>
+                  <span className="sm:hidden">Out</span>
                 </Button>
               </div>
 
@@ -440,7 +443,7 @@ const StudentDashboard = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="sm:hidden p-2 border-slate-300 text-slate-700 hover:bg-slate-50"
+                className="sm:hidden p-2 border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10"
               >
                 {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
@@ -449,10 +452,10 @@ const StudentDashboard = () => {
 
           {/* Mobile Navigation Menu */}
           {isMobileMenuOpen && (
-            <div className="sm:hidden mt-4 pt-4 border-t border-slate-200 space-y-2">
+            <div className="sm:hidden mt-3 pt-3 border-t border-[#9FABBA]/30 space-y-2">
               {university && (
-                <div className="mb-3">
-                  <Badge className="bg-blue-600 text-white font-medium px-3 py-1.5 rounded-lg text-xs">
+                <div className="mb-2">
+                  <Badge className="bg-[#11283F] text-white font-medium px-3 py-1.5 rounded-lg text-xs">
                     <User className="h-3 w-3 mr-1" />
                     <span>{university.name}</span>
                   </Badge>
@@ -464,10 +467,10 @@ const StudentDashboard = () => {
                   setActiveTab('profile');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full justify-start text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
+                className={`w-full justify-start text-sm font-medium px-4 py-2 rounded-xl transition-all duration-200 ${
                   activeTab === 'profile' 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' 
-                    : 'border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'
+                    ? 'bg-[#11283F] hover:bg-[#1A344F] text-white shadow-lg' 
+                    : 'border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10 hover:border-[#4B6584]'
                 }`}
               >
                 <Settings className="h-4 w-4 mr-2" />
@@ -479,10 +482,10 @@ const StudentDashboard = () => {
                   setActiveTab('courses');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full justify-start text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
+                className={`w-full justify-start text-sm font-medium px-4 py-2 rounded-xl transition-all duration-200 ${
                   activeTab === 'courses' 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' 
-                    : 'border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'
+                    ? 'bg-[#11283F] hover:bg-[#1A344F] text-white shadow-lg' 
+                    : 'border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10 hover:border-[#4B6584]'
                 }`}
               >
                 <BookOpen className="h-4 w-4 mr-2" />
@@ -494,7 +497,7 @@ const StudentDashboard = () => {
                   signOut();
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full justify-start border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-medium px-4 py-2 rounded-lg transition-all duration-200"
+                className="w-full justify-start border-[#9FABBA] text-[#4B6584] hover:bg-[#9FABBA]/10 hover:border-[#4B6584] font-medium px-4 py-2 rounded-xl transition-all duration-200"
               >
                 Sign Out
               </Button>
@@ -503,8 +506,8 @@ const StudentDashboard = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {activeTab === 'profile' ? (
+<div className="mx-auto max-w-[1300px] px-6 sm:px-12 lg:px-20 py-8 sm:py-12 bg-[#F5F5F5]">
+          {activeTab === 'profile' ? (
           <StudentProfile />
         ) : previewCourse ? (
           /* Course Preview Modal */
@@ -613,7 +616,7 @@ const StudentDashboard = () => {
             {purchasedCourses.length > 0 && (
               <section>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                  <div className="p-1.5 sm:p-2 bg-blue-900 rounded-xl shadow-lg">
+                  <div className="p-1.5 sm:p-2 bg-[#1A344F] rounded-xl shadow-lg">
                     <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
                   <div>
@@ -636,7 +639,7 @@ const StudentDashboard = () => {
             {/* Public Course Marketplace */}
             <section>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <div className="p-1.5 sm:p-2 bg-blue-900 rounded-xl shadow-lg">
+                <div className="p-1.5 sm:p-2 bg-[#1A344F] rounded-xl shadow-lg">
                   <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
@@ -646,25 +649,47 @@ const StudentDashboard = () => {
               </div>
               
               {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <Card key={i} className="animate-pulse border-slate-200 bg-white">
-                      <div className="h-40 sm:h-48 bg-slate-200 rounded-t-lg"></div>
-                      <CardHeader className="space-y-3 p-4 sm:p-6">
-                        <div className="h-4 bg-slate-200 rounded-lg w-3/4"></div>
-                        <div className="space-y-2">
-                          <div className="h-3 bg-slate-200 rounded w-full"></div>
-                          <div className="h-3 bg-slate-200 rounded w-4/5"></div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="p-4 sm:p-6">
-                        <div className="h-10 bg-slate-200 rounded-lg"></div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                <div className="max-w-6xl mx-auto px-4 py-8 animate-pulse space-y-6">
+  {/* Header Loading */}
+  <div className="flex justify-between items-center">
+    <div className="flex items-center space-x-4">
+      <div className="h-10 w-10 rounded-full bg-[#C4CBD4]" />
+      <div className="space-y-2">
+        <div className="h-4 w-40 bg-[#D0D5DD] rounded" />
+        <div className="h-3 w-24 bg-[#E5E9F0] rounded" />
+      </div>
+    </div>
+    <div className="h-9 w-24 bg-[#C4CBD4] rounded-md" />
+  </div>
+
+  {/* Stats/Progress Boxes */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {Array.from({ length: 3 }).map((_, i) => (
+      <div key={i} className="rounded-xl border border-[#9FABBA]/30 bg-white p-4 space-y-3">
+        <div className="h-4 w-1/3 bg-[#D0D5DD] rounded" />
+        <div className="h-6 w-full bg-[#C4CBD4] rounded" />
+        <div className="h-2 w-3/4 bg-[#E5E9F0] rounded" />
+      </div>
+    ))}
+  </div>
+
+  {/* Course Section Placeholder */}
+  <div className="space-y-3">
+    <div className="h-4 w-1/4 bg-[#9FABBA] rounded" />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="rounded-lg bg-white p-4 border border-[#9FABBA]/30 space-y-3">
+          <div className="h-4 w-3/4 bg-[#D0D5DD] rounded" />
+          <div className="h-3 w-2/3 bg-[#E5E9F0] rounded" />
+          <div className="h-9 w-1/2 bg-[#C4CBD4] rounded-md" />
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
               ) : publicCourses.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-4">
                   {publicCourses
                     .filter(course => !profile?.purchased_courses?.includes(course.id))
                     .map((course) => (
@@ -706,6 +731,8 @@ const StudentDashboard = () => {
         )}
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 
